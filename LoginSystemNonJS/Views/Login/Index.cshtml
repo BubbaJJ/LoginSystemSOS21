@@ -16,10 +16,14 @@
 
     <button class="btn btn-primary">Login</button>
 
-    <div class="alert alert-success invisible">
+    <div class="alert alert-success invisible" role="alert">
         <div>Inloggningen lyckades!</div>
     </div>
-    <div class="alert alert-warning invisible">
+    <div class="alert alert-warning invisible" role="alert">
         <div>Inloggningen misslyckades!</div>
     </div>
 </div>
+
+@section scripts{
+    <script src="~/js/login.js"></script>
+}

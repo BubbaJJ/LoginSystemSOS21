@@ -1,18 +1,40 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using LoginSystemNonJS.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace LoginSystemNonJS.Controllers
 {
     public class LoginController : Controller
     {
+        public readonly ApplicationDbContext _context;
+
+        public LoginController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: LoginController
         public ActionResult Index()
         {
             return View();
+        }
+
+        // GET
+        public async Task<IActionResult> Login(string username, string password)
+        {
+            if (await LoginFound(username, password))
+            {
+                return Ok();
+            }
+            return Unauthorized();
+        }
+
+        // GET
+        public async Task<bool> LoginFound(string username, string password)
+        {
+            return await _context.users.AnyAsync(x => x.Username == username && x.Password == password);
         }
 
         // GET: LoginController/Details/5
