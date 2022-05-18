@@ -3,55 +3,73 @@ using LoginSystemNonJS.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LoginSystemNonJS.Controllers
 {
-    public class LoginController : Controller
+    public class RegisterController : Controller
     {
         public readonly ApplicationDbContext _context;
 
-        public LoginController(ApplicationDbContext context)
+        public RegisterController(ApplicationDbContext context)
         {
             // Koppling till vår databas.
             _context = context;
         }
 
-        // GET: Login
+        // GET: RegisterController
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET
-        public async Task<IActionResult> Login([FromBody] User user)
+        public class Input
         {
-            if (await CheckLogin(user))
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterUser([FromBody] Input input)
+        {
+            var user = new User
             {
-                return Ok();
+                Username = input.Username,
+                Password = input.Password
+            };
+
+            if (await ExistingUser(user))
+            {
+                return Conflict();
             }
-            return Unauthorized();
+
+            _context.users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
-        // GET
-        public async Task<bool> CheckLogin(User user)
+        public async Task<bool> ExistingUser(User user)
         {
-            return await _context.users.AnyAsync(x => x.Username == user.Username && x.Password == user.Password);
+            return await _context.users.AnyAsync(x => x.Username == user.Username);
         }
 
-        // GET: LoginController/Details/5
+        // GET: RegisterController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: LoginController/Create
+        // GET: RegisterController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: LoginController/Create
+        // POST: RegisterController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -66,13 +84,13 @@ namespace LoginSystemNonJS.Controllers
             }
         }
 
-        // GET: LoginController/Edit/5
+        // GET: RegisterController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: LoginController/Edit/5
+        // POST: RegisterController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -87,13 +105,13 @@ namespace LoginSystemNonJS.Controllers
             }
         }
 
-        // GET: LoginController/Delete/5
+        // GET: RegisterController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: LoginController/Delete/5
+        // POST: RegisterController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
